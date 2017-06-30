@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
     cout << "|" << floor(lat*modInc)*increment << "|";
     cout << ceil(lon*modInc)*increment << endl;
     
-
+    
+    
     return 0;
 }
