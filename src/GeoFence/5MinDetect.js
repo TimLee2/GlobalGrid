@@ -19,8 +19,8 @@ function checkIdle(latitude, longitude, idleTime, increment){
 
     while(locationHistory.length > 1){
 
-        var temp = locationHistory[0].item.time;
-        var lastElement = locationHistory.slice(-1)[0].item.time;
+        var temp = locationHistory[0].time;
+        var lastElement = locationHistory.slice(-1)[0].time;
         var diff = lastElement - temp;
 
         if(diff > (idleTime+60)){
@@ -30,8 +30,8 @@ function checkIdle(latitude, longitude, idleTime, increment){
             return false;
         }
         else if (diff >= idleTime && diff <= (idleTime+60)){
-            var coords1 = GenIDFromCoord(locationHistory[0].item.lat, locationHistory[0].item.lon, increment);
-            var coords2 = GenIdFromCoord(locationHistory.slice(-1)[0].item.lat, locationHistory.slice(-1)[0].item.lon, increment);
+            var coords1 = GenIDFromCoord(locationHistory[0].lat, locationHistory[0].lon, increment);
+            var coords2 = GenIdFromCoord(locationHistory.slice(-1)[0].lat, locationHistory.slice(-1)[0].lon, increment);
             if(coords1 == coords2){
                 return true;
             }
