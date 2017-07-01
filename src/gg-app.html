@@ -10,6 +10,10 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./../bower_components/paper-input/paper-input.html">
+<link rel="import" href="./../bower_components/paper-card/paper-card.html">
+<!--<link rel="import" href="">-->
+<link rel="import" href="./../bower_components/geo-location/geo-location.html">
 <link rel="import" href="gg-icons.html">
 <link rel="lazy-import" href="gg-home.html">
 <link rel="lazy-import" href="gg-mvp.html">
@@ -48,12 +52,13 @@
                 font-weight: bold;
             }
         </style>
+        <geo-location watch-pos high-accuracy latitude="{{lat}}" longitude="{{lng}}"></geo-location>
         <app-location route="{{route}}"></app-location>
         <app-route route="{{route}}" pattern="[[rootPattern]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
-        <app-drawer-layout fullbleed>
+        <app-drawer-layout fullbleed responsive-width="2000px">
             <!-- Drawer content -->
             <app-drawer id="drawer" slot="drawer">
-                <app-toolbar>Menu</app-toolbar>
+                <app-toolbar>Navigation</app-toolbar>
                 <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
                     <a name="home" href="home">Home</a>
                     <a name="mvp" href="mvp">MVP</a>
@@ -65,12 +70,12 @@
                 <app-header slot="header" condenses reveals effects="waterfall">
                     <app-toolbar>
                         <paper-icon-button icon="gg-icons:menu" drawer-toggle></paper-icon-button>
-                        <div main-title>GG App</div>
+                        <div main-title>GG Demo</div>
                     </app-toolbar>
                 </app-header>
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
                     <gg-home name="home"></gg-home>
-                    <gg-mvp name="mvp"></gg-mvp>
+                    <gg-mvp name="mvp" la="[[lat]]" lg="[[lng]]" id="[[locID]]" status="[[userStatus]]" inc="{{increment}}" idle="{{idleTime}}"></gg-mvp>
                     <gg-dating name="dating"></gg-dating>
                     <gg-404 name="404"></gg-404>
                 </iron-pages>
@@ -87,14 +92,46 @@
                         reflectToAttribute: true,
                         observer: '_pageChanged',
                     },
+                    idleTime: {
+                        type: Number,
+                        value: 300
+                    },
+                    increment: {
+                        type: Number,
+                        notify: true,
+                        value: 0.00001
+                    },
+                    locID: {
+                        type: String,
+                        notify: true,
+                        computed: "getIDFromCoords(lat, lng, increment)"
+                    },
+                    idleForXMins: {
+                        type: Boolean,
+                        notify: true,
+                        computed: "checkIdle(lat, lng, idleTime, increment)"
+                    },
+                    locationHistory: {
+                        type: Array,
+                        notify: true,
+                        value: []
+                    },
+                    userStatus: {
+                        type: String,
+                        notify: true,
+                        value: "N/A"
+                    },
                     rootPattern: String,
                     routeData: Object,
                     subroute: String,
                 };
             }
-            static get observers() {
-                return ['_routePageChanged(routeData.page)', ];
+            static get observers() { return ['_routePageChanged(routeData.page)', ]; }
+            ready() {
+                super.ready();
+                this.addEventListener('geo-response', e => this._handleNewLocation(e));
             }
+            _showPage404() { this.page = '404'; }
             constructor() {
                 super();
                 // Get root pattern for app-route, for more info about `rootPath` see:
@@ -118,8 +155,11 @@
                 var resolvedPageUrl = this.resolveUrl('gg-' + page + '.html');
                 Polymer.importHref(resolvedPageUrl, null, this._showPage404.bind(this), true);
             }
-            _showPage404() {
-                this.page = '404';
+            _handleNewLocation(e) {
+                console.log(e);
+            }
+            getIDFromCoords(lat, lon, inc) {
+                return (Math.ceil(lat * Math.round(1/inc)) * inc).toFixed((Math.round(1/inc) + "").length - 1) + "|" + (Math.floor(lon * Math.round(1/inc)) * inc).toFixed((Math.round(1/inc) + "").length - 1) + "|" + (Math.floor(lat * Math.round(1/inc)) * inc).toFixed((Math.round(1/inc) + "").length - 1) + "|" + (Math.ceil(lon * Math.round(1/inc)) * inc).toFixed((Math.round(1/inc) + "").length - 1);
             }
         }
         window.customElements.define(GGApp.is, GGApp);

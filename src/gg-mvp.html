@@ -3,22 +3,53 @@
 <dom-module id="gg-mvp">
     <template>
         <style include="main-styles">
-             :host {
+            :host {
                 display: block;
                 padding: 10px;
+                text-align: center;
+            }
+            paper-card {
+                text-align: center;
+                /*--paper-card-background-color: var();*/
+            }
+            paper-card:hover {
+                @apply(--shadow-elevation-6dp);
             }
         </style>
         <div class="card">
-            <div class="circle">2</div>
-            <h1>View Two</h1>
-            <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-            <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
+            <!--<div class="circle">2</div>-->
+            <h1>Global Grid MVP</h1>
+            <!--<p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>-->
+            <!--<p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>-->
+            <paper-input label="Increment" value="{{inc}}"></paper-input>
+            <paper-input label="Idle Time" value="{{idle}}"></paper-input>
+            <h2>Sector ID</h2>
+            <h3>[[id]]</h3>
+            <h2>Location</h2>
+            <h3>[[la]], [[lg]]</h3>
+            <h2># of people inside Sector ID</h2>
+            <h3>1</h3>
+            <h2># of people inside Sector who are Idle</h2>
+            <h3>0</h3>
+            <paper-card heading="User Status" elevation="1" animated-shadow="true">
+                <h1>[[status]]</h1>
+            </paper-card>
         </div>
     </template>
     <script>
         class GGMvp extends Polymer.Element {
-            static get is() {
-                return 'gg-mvp';
+            static get is() { return 'gg-mvp'; }
+            static get properties() {
+                return {
+                    idle: {
+                        type: Number,
+                        notify: true
+                    },
+                    inc: {
+                        type: Number,
+                        notify: true
+                    }
+                };
             }
         }
         window.customElements.define(GGMvp.is, GGMvp);
