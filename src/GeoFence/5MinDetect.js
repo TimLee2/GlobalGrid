@@ -1,4 +1,5 @@
-/*File: 5MinDtect.js
+/*
+* File: 5MinDetect.js
 * Author: Tim Lee
 * Date Created: 6/30/2017
 
@@ -8,6 +9,7 @@
 * getAdjacentSectors function will generate the eight adjacent sectors from the
 * current centered one.
 */
+
 
 /*
 * checkIdle
@@ -49,19 +51,19 @@ function checkIdle(latitude, longitude, idleTime, increment){
 *   id: the current sector
 *   increment: the range of the sector coordinates
 */
-function getAdjacentSectors(id, increment){
+function getAdjacentSectors(id, inc) {
+    var ids = [id];
     var partsArray = id.split('|');
-    for(i=0; i<partsArray.length; i++){
-        partsArray[i] = parseFloat(partsArray[i]);
-    }
-    var toReturn = [id];
-    toReturn.push(partsArray[0]+"|"+(partsArray[1]-increment)+"|"+partsArray[2]+"|"+(partsArray[3]-increment));
-    toReturn.push((partsArray[0]-increment)+"|"+(partsArray[1]-increment)+"|"+(partsArray[2]-increment)+"|"+(partsArray[3]-increment));
-    toReturn.push((partsArray[0]-increment)+"|"+partsArray[1]+"|"+(partsArray[2]-increment)+"|"+partsArray[3]);
-    toReturn.push((partsArray[0]-increment)+"|"+(partsArray[1]+increment)+"|"+(partsArray[2]-increment)+"|"+(partsArray[3]+increment));
-    toReturn.push(partsArray[0]+"|"+(partsArray[1]+increment)+"|"+partsArray[2]+"|"+(partsArray[3]+increment));
-    toReturn.push((partsArray[0]+increment)+"|"+(partsArray[1]+increment)+"|"+(partsArray[2]+increment)+"|"+(partsArray[3]+increment));
-    toReturn.push((partsArray[0]+increment)+"|"+partsArray[1]+"|"+(partsArray[2]+increment)+"|"+partsArray[3]);
-    toReturn.push((partsArray[0]+increment)+"|"+(partsArray[1]-increment)+"|"+(partsArray[2]+increment)+"|"+(partsArray[3]-increment));
-    return toReturn;
+    var decs = (Math.round(1/inc) + "").length - 1;
+    for(i=0; i < partsArray.length; i++) partsArray[i] = parseFloat(partsArray[i]);
+        ids.push(partsArray[0]+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]-inc).toFixed(decs));
+        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
+        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+partsArray[3]);
+        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
+        ids.push(partsArray[0]+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]+inc).toFixed(decs));
+        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
+        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+partsArray[3]);
+        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
+        return ids;
 }
+getAdjacentSectors("37.294|-121.852|37.293|-121.851", 0.001);
