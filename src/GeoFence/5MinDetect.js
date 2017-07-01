@@ -55,15 +55,42 @@ function getAdjacentSectors(id, inc) {
     var ids = [id];
     var partsArray = id.split('|');
     var decs = (Math.round(1/inc) + "").length - 1;
-    for(i=0; i < partsArray.length; i++) partsArray[i] = parseFloat(partsArray[i]);
-        ids.push(partsArray[0]+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]-inc).toFixed(decs));
-        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
-        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+partsArray[3]);
-        ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
-        ids.push(partsArray[0]+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]+inc).toFixed(decs));
-        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
-        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+partsArray[3]);
-        ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
-        return ids;
+    for(i=0; i < partsArray.length; i++){
+        partsArray[i] = parseFloat(partsArray[i]);
+    }
+    ids.push(partsArray[0]+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]-inc).toFixed(decs));
+    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
+    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+partsArray[3]);
+    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
+    ids.push(partsArray[0]+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]+inc).toFixed(decs));
+    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
+    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+partsArray[3]);
+    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
+    return ids;
 }
 getAdjacentSectors("37.294|-121.852|37.293|-121.851", 0.001);
+
+
+/*
+* keyToCoords
+* Converts the key in lat|long|lat|long format into its decimal equivalent.
+*/
+function keyToCoords(id, increment){
+    var partsArray = id.split('|');
+    for(i=0; i < partsArray.length; i++){
+        partsArray[i] = (parseInt(parseArray[i])*increment).toFixed((Math.round(1/inc) + "").length - 1);
+    }
+    return partsArray;
+}
+
+/*
+* coordsToKey
+* Converts the decimal of latitude and longitude into the lat|long|lat|long format.
+*/
+function coordsToKey(increment, coordsArray){
+    for(i=0; i<coordsArray.length; i++){
+        coordsArray[i] = ((coordsArray[i]*(1/increment)).toFixed((Math.round(1/increment) + "").length - 1);
+    }
+    var key = coordsArray.join("|");
+    return key;
+}
