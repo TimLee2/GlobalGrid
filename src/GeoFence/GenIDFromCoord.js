@@ -1,6 +1,5 @@
 //GenIDFromCoord.js
 //Date Created: 6/30/2017
-//
 //This file is the javascript version of the GenIDFromCoord
 
 var minLat = -90.0;
