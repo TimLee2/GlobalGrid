@@ -38,3 +38,8 @@ function checkIdle(latitude, longitude, idleTime, increment){
         }
     }
 }
+
+
+function kmToFeet(km){
+    return km/0.0003048;
+}
