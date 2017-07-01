@@ -43,3 +43,36 @@ int main(int argc, char *argv[]){
     
     return 0;
 }
+
+var minLat = -90.0;
+var maxLat = 90.0;
+var minLong = -180.0;
+var maxLong = 180.0;
+
+var increment = 0.001;
+
+if(process.argv[1] != NULL){
+        increment = parseFloat(process.argv[1]);
+}
+
+var modInc = 1/increment;
+console.log(modInc);
+
+var lat = 23.2365;
+var lon = -141.21343;
+
+if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        console.log(position.coords.latitude + " " + position.coords.longitude);
+    });
+} 
+else {
+    console.log("No Navigator");
+}
+
+var id = Math.ceil(lat*modInc)*increment + "|" + Math.floor(lon*modInc)*increment;
+var id2 = 
+
+console.log(Math.ceil(lat*modInc)*increment + "|" + Math.floor(lon*modInc)*increment);
+console.log()
+
