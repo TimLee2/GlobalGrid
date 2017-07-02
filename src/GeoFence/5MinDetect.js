@@ -62,6 +62,18 @@ function getAdjacentSectors(id, inc) {
         partsArray[i] = parseInt(partsArray[i]);
     }
     var ids = [partsArray.join("|")];
+
+    getSectors(partsArray, ids, inc, decs);
+    return ids;
+}
+getAdjacentSectors("37294|-121852|37293|-121851", .001);
+
+
+/*
+* getSectors
+* Returns an all the adjacent sector strings to be pushed into the array.
+*/
+function getSectors(partsArray, ids, inc, decs){
     ids.push((partsArray[0]+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+partsArray[2]+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
     ids.push((((partsArray[0]*inc)-inc).toFixed(decs)+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+((partsArray[2]*inc)-inc).toFixed(decs)+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
     ids.push((((partsArray[0]*inc)-inc).toFixed(decs)+"|"+partsArray[1]+"|"+((partsArray[2]*inc)-inc).toFixed(decs)+"|"+partsArray[3]).split('.').join(""));
@@ -70,15 +82,8 @@ function getAdjacentSectors(id, inc) {
     ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+((partsArray[1]*inc)+inc).toFixed(decs)+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+((partsArray[3]*inc)+inc).toFixed(decs)).split('.').join(""));
     ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+partsArray[1]+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+partsArray[3]).split('.').join(""));
     ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
-
-    /*for(i=0; i<ids.length; i++){
-        console.log(ids);
-    }*/
-
     return ids;
 }
-getAdjacentSectors("37294|-121852|37293|-121851", .001);
-
 
 /*
 * keyToCoords
