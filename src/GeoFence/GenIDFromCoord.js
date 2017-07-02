@@ -1,6 +1,6 @@
 //GenIDFromCoord.js
 //Date Created: 6/30/2017
-//This file is the javascript version of the GenIDFromCoord
+//This file is the javascript version of the GenIDFromCoord.cpp file.
 
 var minLat = -90.0;
 var maxLat = 90.0;
