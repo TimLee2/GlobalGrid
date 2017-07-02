@@ -2,7 +2,9 @@
 * File: 5MinDetect.js
 * Author: Tim Lee
 * Date Created: 6/30/2017
-
+*
+* This file contains the functions used for anything relate to sectors.
+*
 * checkIdle function will determine whether a coordinate needs to change based
 * on the 5-minute mark.
 *
@@ -52,45 +54,51 @@ function checkIdle(latitude, longitude, idleTime, increment){
 *   increment: the range of the sector coordinates
 */
 function getAdjacentSectors(id, inc) {
-    var ids = [id];
-    var partsArray = id.split('|');
     var decs = (Math.round(1/inc) + "").length - 1;
+    var partsArray = id.split('|');
     for(i=0; i < partsArray.length; i++){
-        partsArray[i] = parseFloat(partsArray[i]);
+        partsArray[i] = parseInt(partsArray[i]);
     }
-    ids.push(partsArray[0]+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]-inc).toFixed(decs));
-    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
-    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+partsArray[3]);
-    ids.push((partsArray[0]-inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]-inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
-    ids.push(partsArray[0]+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+partsArray[2]+"|"+(partsArray[3]+inc).toFixed(decs));
-    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]+inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]+inc).toFixed(decs));
-    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+partsArray[1]+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+partsArray[3]);
-    ids.push((partsArray[0]+inc).toFixed(decs)+"|"+(partsArray[1]-inc).toFixed(decs)+"|"+(partsArray[2]+inc).toFixed(decs)+"|"+(partsArray[3]-inc).toFixed(decs));
+    var ids = [partsArray.join("|")];
+    ids.push((partsArray[0]+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+partsArray[2]+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
+    ids.push((((partsArray[0]*inc)-inc).toFixed(decs)+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+((partsArray[2]*inc)-inc).toFixed(decs)+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
+    ids.push((((partsArray[0]*inc)-inc).toFixed(decs)+"|"+partsArray[1]+"|"+((partsArray[2]*inc)-inc).toFixed(decs)+"|"+partsArray[3]).split('.').join(""));
+    ids.push((((partsArray[0]*inc)-inc).toFixed(decs)+"|"+((partsArray[1]*inc)+inc).toFixed(decs)+"|"+((partsArray[2]*inc)-inc).toFixed(decs)+"|"+((partsArray[3]*inc)+inc).toFixed(decs)).split('.').join(""));
+    ids.push((partsArray[0]+"|"+((partsArray[1]*inc)+inc).toFixed(decs)+"|"+partsArray[2]+"|"+((partsArray[3]*inc)+inc).toFixed(decs)).split('.').join(""));
+    ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+((partsArray[1]*inc)+inc).toFixed(decs)+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+((partsArray[3]*inc)+inc).toFixed(decs)).split('.').join(""));
+    ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+partsArray[1]+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+partsArray[3]).split('.').join(""));
+    ids.push((((partsArray[0]*inc)+inc).toFixed(decs)+"|"+((partsArray[1]*inc)-inc).toFixed(decs)+"|"+((partsArray[2]*inc)+inc).toFixed(decs)+"|"+((partsArray[3]*inc)-inc).toFixed(decs)).split('.').join(""));
+
+    /*for(i=0; i<ids.length; i++){
+        console.log(ids);
+    }*/
+    
     return ids;
 }
-getAdjacentSectors("37.294|-121.852|37.293|-121.851", 0.001);
+getAdjacentSectors("37294|-121852|37293|-121851", .001);
 
 
 /*
 * keyToCoords
-* Converts the key in lat|long|lat|long format into its decimal equivalent.
+* Converts the key in "lat|long|lat|long" format into its decimal equivalent.
 */
 function keyToCoords(id, increment){
     var partsArray = id.split('|');
     for(i=0; i < partsArray.length; i++){
-        partsArray[i] = (parseInt(parseArray[i])*increment).toFixed((Math.round(1/inc) + "").length - 1);
+        partsArray[i] = ((parseInt(partsArray[i])*increment).toFixed((Math.round(1/increment) + "").length - 1));
     }
     return partsArray;
 }
 
 /*
 * coordsToKey
-* Converts the decimal of latitude and longitude into the lat|long|lat|long format.
+* Converts the decimal of latitude and longitude into the "lat|long|lat|long format".
 */
-function coordsToKey(increment, coordsArray){
+function coordsToKey(coordsArray, increment){
     for(i=0; i<coordsArray.length; i++){
-        coordsArray[i] = ((coordsArray[i]*(1/increment)).toFixed((Math.round(1/increment) + "").length - 1);
+        coordsArray[i] = Math.round(((coordsArray[i]*(1/increment)).toFixed((Math.round(1/increment) + "").length - 1)));
     }
     var key = coordsArray.join("|");
+    console.log(key);
     return key;
 }
