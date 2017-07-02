@@ -3,7 +3,7 @@
 * Author: Tim Lee
 * Date Created: 6/30/2017
 *
-* This file contains the functions used for anything relate to sectors.
+* This file contains the functions used for anything related to sectors.
 *
 * checkIdle function will determine whether a coordinate needs to change based
 * on the 5-minute mark.
@@ -15,9 +15,11 @@
 
 /*
 * checkIdle
-* latitude: the latitude coordinate
-* longitude: the longitude coordinate
-* idleTime: 300 seconds
+* Determines if a coordinate has been inside a sector between 300 - 360 seconds.
+* Parameters:
+*   latitude: the latitude coordinate
+*   longitude: the longitude coordinate
+*   idleTime: 300 seconds
 */
 function checkIdle(latitude, longitude, idleTime, increment){
     var item = {lat: latitude, lon: longitude, time: Math.round(Date.now()/1000)};
@@ -72,7 +74,7 @@ function getAdjacentSectors(id, inc) {
     /*for(i=0; i<ids.length; i++){
         console.log(ids);
     }*/
-    
+
     return ids;
 }
 getAdjacentSectors("37294|-121852|37293|-121851", .001);
