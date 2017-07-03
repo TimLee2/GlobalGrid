@@ -17,23 +17,29 @@
             }
         </style>
         <div class="card">
-            <!--<div class="circle">2</div>-->
             <h1>Global Grid MVP</h1>
-            <!--<p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>-->
-            <!--<p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>-->
-            <paper-input label="Increment" value="{{inc}}"></paper-input>
-            <paper-input label="Idle Time" value="{{idle}}"></paper-input>
+            <paper-input label="My Name" value="{{udata.name}}"></paper-input>
+            <paper-input label="Increment in Degrees" value="{{settings.increment}}"></paper-input>
+            <paper-input label="Max Distance in KM ([[convertKMtoFT(settings.maxTolerableDistanceInKm)]]ft)" value="{{settings.maxTolerableDistanceInKm}}"></paper-input>
+            <paper-input label="Idle Time" value="{{settings.idleTime}}"></paper-input>
             <h2>Sector ID</h2>
-            <h3>[[id]]</h3>
+            <h3>[[udata.sector]]</h3>
             <h2>Location</h2>
             <h3>[[la]], [[lg]]</h3>
             <h2># of people inside Sector ID</h2>
-            <h3>1</h3>
-            <h2># of people inside Sector who are Idle</h2>
+            <h3>[[getNumInSector(others, udata.sector)]]</h3>
+            <h2>Distances of people around you</h2>
+            <h3>You: [[udata.name]] - 0 km</h3>
+            <!--<template is="dom-repeat" items="{{getPeopleInSector(others, udata.sector)}}" as="item" index-as="index" filter="isHandler" sort="sortHandler" observe="itemField1 itemField2">
+                 {{item}} and {{index}} can be used in this binding scope
+                <h3>[[index]]: [[item]] - 0 km</h3>
+            </template>-->
+
+            <!--<h2># of people inside Sector who are Idle</h2>
             <h3>0</h3>
             <paper-card heading="User Status" elevation="1" animated-shadow="true">
                 <h1>[[status]]</h1>
-            </paper-card>
+            </paper-card>-->
         </div>
     </template>
     <script>
@@ -41,15 +47,47 @@
             static get is() { return 'gg-mvp'; }
             static get properties() {
                 return {
-                    idle: {
-                        type: Number,
+                    la: {
                         notify: true
-                    },
-                    inc: {
-                        type: Number,
+                    }, lg: {
+                        notify: true
+                    }, lh: {
                         notify: true
                     }
                 };
+            }
+            convertKMtoFT(km) {
+                return Math.round(km/0.0003048);
+            }
+            getPeopleInSector(locations, sector) {
+                console.log("==========================PEOPLE IN SECTOR FUNCTIN==========================");
+                console.log("locations");
+                console.log(locations);
+                console.log("sector");
+                console.log(sector);
+                console.log("isGood(sector)");
+                console.log(isGood(sector));
+                console.log("isGood(locations)");
+                console.log(isGood(locations));
+                if(isGood(locations[sector])) {
+                    console.log("Object.keys(locations[sector])");
+                    console.log(Object.keys(locations[sector]));
+                }
+                console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                return (isGood(locations) && isGood(sector) && isGood(locations[sector]))?Object.keys(locations[sector]):["You"];
+            }
+            getNumInSector(locations, sector) {
+                console.log("==========================NUM PEOPLE IN SECTOR FUN==========================");
+                console.log("locations");
+                console.log(locations);
+                console.log("sector");
+                console.log(sector);
+                console.log("isGood(sector)");
+                console.log(isGood(sector));
+                console.log("isGood(locations)");
+                console.log(isGood(locations));
+                console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                return this.getPeopleInSector(locations, sector).length;
             }
         }
         window.customElements.define(GGMvp.is, GGMvp);
