@@ -278,10 +278,10 @@
                 return users;
             },
             confirm() {
-
+                this.reset();
             },
             dismiss() {
-
+                this.reset();
             },
             reset() {
                 this.set("go", false);
@@ -296,7 +296,10 @@
                 if(this.nearbyUsers.length > 1)
                     this.set("nearbyUsers", this.orderNearbyUsers(this.nearbyUsers));
                 var indicies = [];
-                if(data.detail.data.favorites > 0 && this.favoriteActivities.length > 0 && this.go && this.getDistanceFromLatLonInKm(this.lat, this.lng, this.nearbyUsers[0].lat, this.nearbyUsers[0].lon) < this.maxDistanceKm) {
+                console.log(data.detail.data.favorites.length);
+                console.log(this.favoriteActivities.length);
+                console.log(this.go);
+                if(data.detail.data.favorites.length > 0 && this.favoriteActivities.length > 0 && this.go && this.getDistanceFromLatLonInKm(this.lat, this.lng, this.nearbyUsers[0].lat, this.nearbyUsers[0].lon) < this.maxDistanceKm) {
                     console.log("Checking user...");
                     for(var i = 0; i < this.favoriteActivities.length; i++)
                         if(data.detail.data.favorites[i] == this.favoriteActivities[i])
