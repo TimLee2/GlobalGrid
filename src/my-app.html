@@ -1,0 +1,334 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-alert-dialog/paper-alert-dialog-icon-header.html">
+<link rel="import" href="../bower_components/paper-alert-dialog/paper-alert-dialog.html">
+<link rel="import" href="./../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="./../bower_components/paper-input/paper-input.html">
+<link rel="import" href="./../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="./../bower_components/geo-location/geo-location.html">
+<link rel="import" href="./../bower_components/polymerfire/polymerfire.html">
+<!--<link rel="import" href="">-->
+<link rel="import" href="./satori-lib.html">
+<link rel="import" href="my-icons.html">
+<!--
+    polymer serve -o -p 8080
+    polymer build && firebase deploy && firebase
+
+    ToDo:
+    - Implement Satori
+-->
+<dom-module id="my-app">
+    <template>
+        <style>
+             :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                display: block;
+                /* text-align: center; */
+            }
+            /* app-drawer-layout:not([narrow]) [drawer-toggle] {
+                display: none;
+            } */
+
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            .drawer-list {
+                margin: 0 20px;
+            }
+
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+                line-height: 40px;
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+
+            iron-pages {
+                text-align: center;
+            }
+        </style>
+        <firebase-app auth-domain="earthgrid-cc4e4.firebaseio.com" database-url="https://earthgrid-cc4e4.firebaseio.com/"
+            api-key="AIzaSyBYNdyJJn3o45wNO-PTgoV4FG0gxjZntfI"></firebase-app>
+        <firebase-auth id="auth" user="{{user}}" provider="google"></firebase-auth>
+        <firebase-document id="userDoc" path="/users/{{user.uid}}" data="{{userData}}"></firebase-document>
+        <template is="dom-if" if="[[isGood(user.uid)]]">
+            <geo-location watch-pos high-accuracy latitude="{{lat}}" longitude="{{lng}}"></geo-location>
+        </template>
+        <satori-lib id="rtm" subscription-channels="{{querySectors}}" uid="[[user.uid]]"></satori-lib>
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+        <app-drawer-layout fullbleed responsive-width="2000px">
+            <app-drawer id="drawer">
+                <app-toolbar>Menu</app-toolbar>
+                <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <a name="view1" href="/view1">Debug</a>
+                    <a name="view2" href="/view2">Dating</a>
+                    <a name="view3" href="/view3">Activity</a>
+                    <a name="view4" href="/view4">Heat Map</a>
+                </iron-selector>
+            </app-drawer>
+            <app-header-layout has-scrolling-region>
+                <app-header condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+                        <div main-title>Eyeshot [[version]]</div>
+                    </app-toolbar>
+                </app-header>
+                 <h1 on-tap="alertOpen">Open!</h1>
+                <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
+                    <my-view1 name="view1" lat="[[lat]]" lng="[[lng]]" sector="[[sector]]" v="[[version]]" max="[[maxDistanceKm]]" inc="[[increment]]"
+                        lu="[[lastUpdated]]" as="[[adjacentSectors]]" nu="[[nearbyUsers]]" uid="[[user.uid]]" udata="{{userData}}"></my-view1>
+                    <my-view2 name="view2"></my-view2>
+                    <my-view3 name="view3"></my-view3>
+                    <my-view4 name="view4"></my-view4>
+                    <my-view404 name="view404"></my-view404>
+                </iron-pages>
+                <!-- <paper-textarea label="Location" value="[[parseJson(lat, lng, sector, user.uid)]]" readonly></paper-textarea> -->
+            </app-header-layout>
+        </app-drawer-layout>
+        <paper-alert-dialog id="match" dismiss-button="No..." confirm-button="Yes" on-confirm="confirm" on-dismiss="dismiss">
+            <paper-alert-dialog-icon-header icon="my-icons:error">Look Around!</paper-alert-dialog-icon-header>
+            You have a match! Reveal?
+        </paper-alert-dialog>
+        <paper-toast id="welcomeToast" text="Welcome, Fellow Adventurer!"></paper-toast>
+    </template>
+    <script>
+        Polymer({
+            is: 'my-app',
+            properties: {
+                version: {
+                    type: String,
+                    value: "v0.02"
+                },
+                lat: {
+                    type: Number,
+                    notify: true
+                },
+                lon: {
+                    type: Number,
+                    notify: true
+                },
+                lastUpdated: {
+                    type: Number,
+                    notify: true
+                },
+                sector: {
+                    type: String,
+                    notify: true
+                },
+                adjacentSectors: {
+                    type: Array,
+                    notify: true
+                },
+                querySectors: {
+                    type: Array,
+                    notify: true
+                },
+                nearbyUsers: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged',
+                },
+                increment: {
+                    type: Number,
+                    value: 0.001
+                },
+                maxDistanceKm: {
+                    type: Number,
+                    value: 0.02
+                }, vibeLength: {
+                    type: Number,
+                    value: 2500
+                }
+            },
+            listeners: {
+                'geo-response': '_handleLoc',
+                'kick': '_handleSatori'
+            },
+            observers: ['_routePageChanged(routeData.page)', 'login(user, userData)'],
+            ready() {
+                super.ready();
+                this.$.auth.signInAnonymously();
+            },
+            login(user, data) {
+                log("===========================NEW USER EXIST CHECK===========================");
+                log("user");
+                log(user);
+                log("data");
+                log(data);
+                if (user !== null) this.$.userDoc.getStoredValue("/users/" + user.uid).then((response) => {
+                    log("response");
+                    log(response);
+                    if (Object.keys(response).length === 0 && response.constructor === Object) {
+                        log("GOTTA ADD " + this.user.uid + "! CREATING NEW USER...");
+                        var temp = {};
+                        temp.id = user.uid;
+                        temp.name = "Default";
+                        this.set("userData", temp);
+                        this.$.welcomeToast.open();
+                    }
+                    log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                });
+            },
+            getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+                var p = 0.017453292519943295;
+                return 12742 * Math.asin(Math.sqrt(0.5 - Math.cos((lat2 - lat1) * p) / 2 + Math.cos(lat1 * p) *
+                    Math.cos(lat2 * p) * (1 - Math.cos((lon2 - lon1) * p)) / 2));
+            },
+            getIDFromCoords(lat, lon, inc) {
+                return ((Math.ceil(lat * Math.round(1 / inc)) * inc).toFixed((Math.round(1 / inc) + "").length -
+                    1) + "|" + (Math.floor(lon * Math.round(1 / inc)) * inc).toFixed((Math.round(1 /
+                    inc) + "").length - 1) + "|" + (Math.floor(lat * Math.round(1 / inc)) * inc).toFixed(
+                    (Math.round(1 / inc) + "").length - 1) + "|" + (Math.ceil(lon * Math.round(1 / inc)) *
+                    inc).toFixed((Math.round(1 / inc) + "").length - 1)).split('.').join("");
+            },
+            getAdjacentSectors(id, inc) {
+                var arr = this.getQuerySectors(id, inc);
+                arr.shift();
+                return arr;
+            },
+            getQuerySectors(id, inc) {
+                var decs = (Math.round(1 / inc) + "").length - 1;
+                var partsArray = id.split('|');
+                for (i = 0; i < partsArray.length; i++) partsArray[i] = parseInt(partsArray[i]);
+                var ids = [partsArray.join("|")];
+                return this.getSectors(partsArray, ids, inc, decs);
+            },
+            getSectors(partsArray, ids, inc, decs) {
+                ids.push((partsArray[0] + "|" + ((partsArray[1] * inc) - inc).toFixed(decs) + "|" + partsArray[
+                    2] + "|" + ((partsArray[3] * inc) - inc).toFixed(decs)).split('.').join(""));
+                ids.push((((partsArray[0] * inc) - inc).toFixed(decs) + "|" + ((partsArray[1] * inc) - inc).toFixed(
+                    decs) + "|" + ((partsArray[2] * inc) - inc).toFixed(decs) + "|" + ((partsArray[
+                    3] * inc) - inc).toFixed(decs)).split('.').join(""));
+                ids.push((((partsArray[0] * inc) - inc).toFixed(decs) + "|" + partsArray[1] + "|" + ((
+                    partsArray[2] * inc) - inc).toFixed(decs) + "|" + partsArray[3]).split('.').join(""));
+                ids.push((((partsArray[0] * inc) - inc).toFixed(decs) + "|" + ((partsArray[1] * inc) + inc).toFixed(
+                    decs) + "|" + ((partsArray[2] * inc) - inc).toFixed(decs) + "|" + ((partsArray[
+                    3] * inc) + inc).toFixed(decs)).split('.').join(""));
+                ids.push((partsArray[0] + "|" + ((partsArray[1] * inc) + inc).toFixed(decs) + "|" + partsArray[
+                    2] + "|" + ((partsArray[3] * inc) + inc).toFixed(decs)).split('.').join(""));
+                ids.push((((partsArray[0] * inc) + inc).toFixed(decs) + "|" + ((partsArray[1] * inc) + inc).toFixed(
+                    decs) + "|" + ((partsArray[2] * inc) + inc).toFixed(decs) + "|" + ((partsArray[
+                    3] * inc) + inc).toFixed(decs)).split('.').join(""));
+                ids.push((((partsArray[0] * inc) + inc).toFixed(decs) + "|" + partsArray[1] + "|" + ((
+                    partsArray[2] * inc) + inc).toFixed(decs) + "|" + partsArray[3]).split('.').join(""));
+                ids.push((((partsArray[0] * inc) + inc).toFixed(decs) + "|" + ((partsArray[1] * inc) - inc).toFixed(
+                    decs) + "|" + ((partsArray[2] * inc) + inc).toFixed(decs) + "|" + ((partsArray[
+                    3] * inc) - inc).toFixed(decs)).split('.').join(""));
+                return ids;
+            },
+            orderNearbyUsers(users) {
+                var that = this;
+                users = users.sort(function compare(a, b) {
+                    return (that.getDistanceFromLatLonInKm(that.lat, that.lng, a.lat, a.lon) > that.getDistanceFromLatLonInKm(that.lat, that.lng, b.lat, b.lon)) ? 1 : -1;
+                });
+                return users;
+            },
+            _handleSatori(data) {
+                console.log(data.detail.data);
+                this.set("nearbyUsers", this.nearbyUsers.filter(function( obj ) { return obj.id !== data.detail.data.id; }));
+                this.push("nearbyUsers", data.detail.data);
+                if(this.nearbyUsers.length > 1)
+                    this.set("nearbyUsers", this.orderNearbyUsers(this.nearbyUsers));
+                if(this.getDistanceFromLatLonInKm(this.lat, this.lng, this.nearbyUsers[0].lat, this.nearbyUsers[0].lon) < this.maxDistanceKm) {
+                    vibrate(5000);
+                    alertOpen();
+                }
+                console.log(this.nearbyUsers);
+            },
+            _handleLoc(data) {
+                log("==========================USER LOCATION MONITORING==========================");
+                log(data.detail.latitude);
+                log(data.detail.longitude);
+                log(this.increment);
+                this.set("lastUpdated", data.detail.position.timestamp);
+                if (isGood(data.detail.latitude) && isGood(data.detail.longitude)) this.set("sector", this.getIDFromCoords(
+                    data.detail.latitude, data.detail.longitude, this.increment));
+                log(this.lastUpdated);
+                log(this.sector);
+                this.set("querySectors", this.getQuerySectors(this.sector, this.increment));
+                this.set("adjacentSectors", this.getAdjacentSectors(this.sector, this.increment));
+                if (isGood(this.user) && isGood(this.user.uid)) this.$.rtm.publishGen(this.sector, {
+                    "id": this.user.uid,
+                    "name": this.userData.name,
+                    "lat": data.detail.latitude,
+                    "lon": data.detail.longitude,
+                    "time": data.detail.position.timestamp,
+                    "sector": this.sector
+                });
+                log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            },
+            _routePageChanged: function (page) {
+                this.page = page || 'view1';
+                if (!this.$.drawer.persistent) {
+                    this.$.drawer.close();
+                }
+            },
+            _pageChanged: function (page) {
+                var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            },
+            _showPage404: function () {
+                this.page = 'view404';
+            },
+            parseJson() {
+                var items = [].slice.apply(arguments);
+                return items.reduce(function (acc, item) {
+                    return acc + "\nObject\n" + JSON.stringify(item, null, 4);
+                }, "");
+            },
+            isGood(o) {
+                return isGood(o);
+            },
+            alertOpen() {
+                console.log("opening dialogue");
+                this.$.match.open();
+            }
+        });
+        var debug = false;
+
+        function log(message) {
+            if (debug) console.log(message);
+        }
+
+        function isGood(o) {
+            return o !== undefined && o !== null && o !== "" && !(Object.keys(o).length === 0 && o.constructor ===
+                Object);
+        }
+
+        var canVibrate = "vibrate" in navigator || "mozVibrate" in navigator;
+        if (canVibrate && !("vibrate" in navigator)) navigator.vibrate = navigator.mozVibrate;
+
+        function vibrate(length) {
+            navigator.vibrate(length);
+        }
+    </script>
+</dom-module>

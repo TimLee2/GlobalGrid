@@ -1,0 +1,111 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<dom-module id="my-view1">
+    <template>
+        <style include="shared-styles">
+             :host {
+                display: block;
+                padding: 10px;
+            }
+
+            paper-card {
+                text-align: center;
+            }
+        </style>
+        <div class="card">
+            <h1 on-tap="vibrateMe">EyeShot MVP [[v]]</h1>
+            <!-- <paper-input label="Increment in Degrees" value="{{settings.increment}}"></paper-input> -->
+            <!-- <paper-input label="Idle Time" value="{{settings.idleTime}}"></paper-input> -->
+            <h2>Location</h2>
+            <p>[[lat]], [[lng]]</p>
+            <h2>Sector ID</h2>
+            <p>[[sector]]</p>
+            <paper-input label="My Name" value="{{udata.name}}"></paper-input>
+            <paper-input label="Max Distance in KM ([[convertKMtoFT(max)]]ft)" value="{{max}}"></paper-input>
+            <h2>People Nearby</h2>
+            <template is="dom-repeat" items="{{nu}}" as="item" index-as="index">
+                <p>[[item.name]]: [[getDistanceFromItem(item)]]ft</p>
+            </template>
+            <h2>Ajacent Sectors</h2>
+            <template is="dom-repeat" items="{{as}}" as="item" index-as="index">
+                <p>[[item]]</p>
+            </template>
+            <h2>Your ID</h2>
+            <p>[[uid]]</p>
+            <h2>Last Updated</h2>
+            <p>[[epochToDate(lu)]]</p>
+            <!--<h2># of people inside Sector who are Idle</h2>
+            <h3>0</h3>
+            <paper-card heading="User Status" elevation="1" animated-shadow="true">
+                <h1>[[status]]</h1>
+            </paper-card>-->
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'my-view1',
+            properties: {
+                lat: {
+                    type: Number,
+                    notify: true
+                }, lng: {
+                    type: Number,
+                    notify: true
+                }, sector: {
+                    type: String,
+                    notify: true
+                }, lu: {
+                    type: Number,
+                    notify: true
+                }, as: {
+                    type: String,
+                    notify: true
+                }
+            },
+            epochToDate(e) {
+                return new Date(e).toLocaleString();
+            },
+            convertKMtoFT(km) {
+                return Math.round(km / 0.0003048);
+            },
+            getDistanceFromLatLngInKm(lat1, lng1, lat2, lng2) {
+                var p = 0.017453292519943295;
+                return 12742 * Math.asin(Math.sqrt(0.5 - Math.cos((lat2 - lat1) * p) / 2 + Math.cos(lat1 * p) *
+                    Math.cos(lat2 * p) * (1 - Math.cos((lng2 - lng1) * p)) / 2));
+            },
+            getDistanceFromItem(item) {
+                return this.convertKMtoFT(this.getDistanceFromLatLngInKm(this.lat, this.lng, item.lat, item.lon));
+            },
+            vibrateMe() {
+                console.log("vibin!");
+                vibrate(1500);
+            }
+            // getPeopleInSector(sectors) {
+            //     log("==========================PEOPLE IN SECTOR FUNCTIN==========================");
+            //     log("sectors");
+            //     log(sectors);
+            //     log("isGood(sectors)");
+            //     log(isGood(sectors));
+            //     if (isGood(sectors)) {
+            //         log("isGood(sectors)");
+            //         log(isGood(sectors));
+            //     }
+            //     log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            //     return (isGood(sectors)) ? Object.keys(sectors) : ["You"];
+            // },
+            // getNumInSector(sectors) {
+            //     // console.log("==========================NUM PEOPLE IN SECTOR FUN==========================");
+            //     // console.log("sectors");
+            //     // console.log(sectors);
+            //     //console.log("isGood(sectors)");
+            //     //console.log(isGood(sectors));
+            //     // console.log("this.getPeopleInSector(sectors, sector)");
+            //     // console.log(this.getPeopleInSector(sectors, sector));
+            //     // console.log("this.getPeopleInSector(sectors, sector).length");
+            //     // console.log(this.getPeopleInSector(sectors, sector).length);
+            //     // console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            //     return this.getPeopleInSector(sectors).length;
+            // },
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,121 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<dom-module id="satori-lib">
+    <template> </template>
+    <script src="satori.js"></script>
+    <script>
+        Polymer({
+            is: 'satori-lib',
+            properties: {
+                end: {
+                    type: String,
+                    value: "wss://j30s1hd5.api.satori.com"
+                },
+                key: {
+                    type: String,
+                    value: "2CfD5b95E262EA5d6542B76F6FcBe51E"
+                },
+                client: {
+                    type: Object,
+                    computed: "_getRTM(end, key)",
+                    notify: true,
+                    observer: "_clientAcquired"
+                },
+                defaultMode: {
+                    type: Object,
+                    value: RTM.SubscriptionMode.SIMPLE
+                },
+                subscriptionChannels: {
+                    type: Array,
+                    value: [],
+                    notify: true,
+                    observer: "updateSubscriptions"
+                },
+                homeChannel: {
+                    type: String,
+                    notify: true,
+                    computed: "_getHome(subscriptionChannels)"
+                }
+            },
+            publishGen(channel, msg) {
+                if(this.checkConnected()) this.client.publish(channel, msg);
+            },
+            publish(msg) {
+                this.publishGen(this.homeChannel, msg);
+            },
+            subscrib(client, channel) {
+                var that = this;
+                var subscription = client.subscribe(channel, this.defaultMode, {
+                    filter: 'SELECT * FROM `'+channel+'` WHERE id != "'+this.uid+'"',
+                });
+                subscription.on("enter-subscribed", function () {
+                    console.log("Subscribed to the channel: " + channel);
+                });
+                subscription.on("rtm/subscribe/error", function (pdu) {
+                    console.log("Error Arrived");
+                    log(pdu);
+                    console.log("Failed to subscribe: " + pdu.body.error + " - " + pdu.body.reason);
+                });
+                subscription.on("rtm/subscription/data", function (pdu) {
+                    log("Data Arrived");
+                    log(pdu);
+                    for(packet in pdu.body.messages)
+                        that.fireEvent(pdu.body.messages[packet]);
+                });
+            },
+            fireEvent(msg) {
+                this.fire('kick', {"data": msg});
+            },
+            unsubscrib(client, channel) {
+                client.unsubscribe(channel);
+            },
+            updateSubscriptions(newChannels, oldChannels) {
+                log("Older Channels:");
+                log(oldChannels);
+                log("Newer Channels:");
+                log(newChannels);
+                if(!(isGood(oldChannels) && isGood(newChannels)))
+                    return;
+                var unsubscribes = oldChannels.filter(x => newChannels.indexOf(x) == -1);
+                var subscribes = newChannels.filter(x => oldChannels.indexOf(x) == -1);
+                log("Unsubscribing from...");
+                log(unsubscribes);
+                log("Subscribing to...");
+                log(subscribes);
+                for (channel in unsubscribes) this.unsubscrib(this.client, unsubscribes[channel]);
+                for (channel in subscribes) this.subscrib(this.client, subscribes[channel]);
+            },
+            checkConnected() {
+                log("The client is connected: " + this.client.isConnected());
+                return this.client.isConnected();
+            },
+            checkStopped() {
+                log("The client is Stopped: " + this.client.isStopped());
+                return this.client.isStopped();
+            },
+            _getRTM(endpoint, appKey) {
+                return new RTM(endpoint, appKey);
+            },
+            _getHome(channels) {
+                return channels.splice();
+            },
+            _clientAcquired(newClient, oldClient) {
+                log("oldClient");
+                log(oldClient);
+                log("newClient");
+                log(newClient);
+                this.client.on("enter-connected", function () {
+                    console.log("Connected to Satori RTM!");
+                });
+                this.client.on("leave-connected", function () {
+                    console.log("Disconnected from Satori RTM");
+                });
+                this.client.on("error", function (error) {
+                    console.log("RTM client failed!");
+                    console.log(error);
+                });
+                this.client.start();
+            }
+        });
+    </script>
+</dom-module>

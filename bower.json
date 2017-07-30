@@ -5,33 +5,28 @@
   ],
   "license": "https://polymer.github.io/LICENSE.txt",
   "dependencies": {
-    "app-layout": "PolymerElements/app-layout#2.0-preview",
-    "app-route": "PolymerElements/app-route#2.0-preview",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#2.0-preview",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#2.0-preview",
-    "iron-media-query": "PolymerElements/iron-media-query#2.0-preview",
-    "iron-pages": "PolymerElements/iron-pages#2.0-preview",
-    "iron-selector": "PolymerElements/iron-selector#2.0-preview",
-    "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0",
-    "polymer": "Polymer/polymer#^2.0.0-rc.3",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0-rc.7",
+    "app-layout": "PolymerElements/app-layout#^0.10.0",
+    "app-route": "PolymerElements/app-route#^0.9.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.0",
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
+    "iron-pages": "PolymerElements/iron-pages#^1.0.0",
+    "iron-selector": "PolymerElements/iron-selector#^1.0.0",
+    "paper-icon-button": "PolymerElements/paper-icon-button#~1.1.0",
+    "polymer": "Polymer/polymer#^1.6.0",
     "geo-location": "ebidel/geo-location#^1.0.6",
+    "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-input": "PolymerElements/paper-input#^2.0.1",
-    "paper-card": "PolymerElements/paper-card#^2.0.0",
     "polymerfire": "firebase/polymerfire#^2.1.0",
-    "paper-toast": "PolymerElements/paper-toast#^2.0.0"
-  },
-  "resolutions": {
-    "polymer": "^2.0.0-rc.3",
-    "iron-flex-layout": "2.0-preview",
-    "iron-behaviors": "2.0-preview",
-    "iron-a11y-keys-behavior": "2.0-preview",
-    "iron-form-element-behavior": "2.0-preview",
-    "paper-styles": "2.0-preview",
-    "iron-resizable-behavior": "2.0-preview"
+    "iron-list": "PolymerElements/iron-list#^2.0.8",
+    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1"
   },
   "devDependencies": {
-    "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"
+    "web-component-tester": "^4.0.0"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "iron-icon": "^1.0.0"
+  }
 }
