@@ -14,6 +14,9 @@
 <link rel="import" href="../bower_components/paper-alert-dialog/paper-alert-dialog.html">
 <link rel="import" href="./../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="./../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="./../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="./../bower_components/geo-location/geo-location.html">
 <link rel="import" href="./../bower_components/polymerfire/polymerfire.html">
@@ -30,7 +33,7 @@
 <dom-module id="my-app">
     <template>
         <style>
-             :host {
+            :host {
                 --app-primary-color: #4285f4;
                 --app-secondary-color: black;
                 display: block;
@@ -65,10 +68,6 @@
                 color: black;
                 font-weight: bold;
             }
-
-            iron-pages {
-                text-align: center;
-            }
         </style>
         <firebase-app auth-domain="earthgrid-cc4e4.firebaseio.com" database-url="https://earthgrid-cc4e4.firebaseio.com/"
             api-key="AIzaSyBYNdyJJn3o45wNO-PTgoV4FG0gxjZntfI"></firebase-app>
@@ -77,7 +76,8 @@
         <template is="dom-if" if="[[isGood(user.uid)]]">
             <geo-location watch-pos high-accuracy latitude="{{lat}}" longitude="{{lng}}"></geo-location>
         </template>
-        <satori-lib id="rtm" subscription-channels="{{querySectors}}" uid="[[user.uid]]"></satori-lib>
+        <satori-lib id="rtmLib" subscription-channels="{{querySectors}}" uid="[[user.uid]]"></satori-lib>
+        <satori-meetup id="rtmEvent" acs="[[activities]]" facs="[[favoriteActivities]]"></satori-meetup>
         <app-location route="{{route}}"></app-location>
         <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
         <app-drawer-layout fullbleed responsive-width="2000px">
@@ -85,9 +85,9 @@
                 <app-toolbar>Menu</app-toolbar>
                 <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
                     <a name="view1" href="/view1">Debug</a>
-                    <a name="view2" href="/view2">Dating</a>
+                    <!-- <a name="view2" href="/view2">Dating</a> -->
                     <a name="view3" href="/view3">Activity</a>
-                    <a name="view4" href="/view4">Heat Map</a>
+                    <!-- <a name="view4" href="/view4">Heat Map</a> -->
                 </iron-selector>
             </app-drawer>
             <app-header-layout has-scrolling-region>
@@ -97,13 +97,13 @@
                         <div main-title>Eyeshot [[version]]</div>
                     </app-toolbar>
                 </app-header>
-                 <h1 on-tap="alertOpen">Open!</h1>
+                 <!-- <h1 on-tap="alertOpen">Open!</h1> -->
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
                     <my-view1 name="view1" lat="[[lat]]" lng="[[lng]]" sector="[[sector]]" v="[[version]]" max="[[maxDistanceKm]]" inc="[[increment]]"
                         lu="[[lastUpdated]]" as="[[adjacentSectors]]" nu="[[nearbyUsers]]" uid="[[user.uid]]" udata="{{userData}}"></my-view1>
-                    <my-view2 name="view2"></my-view2>
-                    <my-view3 name="view3"></my-view3>
-                    <my-view4 name="view4"></my-view4>
+                    <!-- <my-view2 name="view2"></my-view2> -->
+                    <my-view3 name="view3" list="[[activities]]" favlists="{{favoriteActivities}}"></my-view3>
+                    <!-- <my-view4 name="view4"></my-view4> -->
                     <my-view404 name="view404"></my-view404>
                 </iron-pages>
                 <!-- <paper-textarea label="Location" value="[[parseJson(lat, lng, sector, user.uid)]]" readonly></paper-textarea> -->
@@ -119,6 +119,11 @@
         Polymer({
             is: 'my-app',
             properties: {
+                go: {
+                    type: Boolean,
+                    value: true,
+                    notify: true
+                },
                 version: {
                     type: String,
                     value: "v0.02"
@@ -163,15 +168,35 @@
                 },
                 maxDistanceKm: {
                     type: Number,
-                    value: 0.02
-                }, vibeLength: {
+                    value: 0.025
+                },
+                timeOut: {
+                    type: Number,
+                    value: 10000
+                },
+                vibeLength: {
                     type: Number,
                     value: 2500
+                },
+                activities: {
+                    type: Array,
+                    value: ["Meetup", "Aquarium", "Arts & Culture", "Baking", "Baseball", "Basketball", "BBQ", "Beach", "Biking", "Binge Watch Shows", "Bingo", "Board Games", "Bonfires", "Book Clubs", "Bowling", "Camping", "Card Games", "Career & Business", "Cars & Motorcycles", "Clothing", "Coding", "Coffee", "Community & Environment", "Cooking", "Dancing", "Dog Park", "Drawing", "Driving", "Eating", "Education & Learning", "Exploring Cities", "Fashion & Beauty", "Fishing", "Fitness", "Flea Market", "Food & Drink", "Football", "Frisbee", "Games", "Happy Hour", "Health & Wellbeing", "Hiking", "Hobbies & Crafts", "Hockey", "Horseback Riding", "Hunting", "Ice Skating", "Karaoke", "Kayaking", "Lake Boating", "Language & Ethnic Identity", "LGBT", "Library", "Lifestyle", "Movements & Politics", "Movies & Film", "Museum", "Music", "New Age & Spirituality", "Outdoors & Adventure", "Paint Nails", "Paranormal", "Parents & Family", "Pets & Animals", "Photography", "Picnic", "Puzzles", "Racquetball", "Religion & Beliefs", "Road Trip", "Rodeo", "Running", "Sailing", "Sci-Fi & Fantasy", "Scuba Diving", "Shopping", "Singles", "Site Seeing", "Skiing", "Snowboarding", "Socializing", "Spa", "Spinning Class", "Sports & Recreation", "Support", "Swimming", "Table Tennis", "Taking Classes", "Tea", "Tech", "Tennis", "Travel", "Volleyball", "Walking", "Water Balloon Fight", "Wine Tasting", "Writing", "Yoga", "Zoo"],
+                    notify: true
+                },
+                favoriteActivities: {
+                    type: Array,
+                    value: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+                    notify: true
+                },
+                meetupOnlyActivities: {
+                    type: Array,
+                    value: ["Arts & Culture", "Book Clubs", "Career & Business", "Cars & Motorcycles", "Community & Environment", "Dancing", "Education & Learning", "Fashion & Beauty", "Fitness", "Food & Drink", "Games", "Movements & Politics", "Health & Wellbeing", "Hobbies & Crafts", "Language & Ethnic Identity", "LGBT", "Lifestyle", "Movies & Film", "Music", "New Age & Spirituality", "Outdoors & Adventure", "Paranormal", "Parents & Family", "Pets & Animals", "Photography", "Religion & Beliefs", "Sci-Fi & Fantasy", "Singles", "Socializing", "Sports & Recreation", "Support", "Tech Writing"]
                 }
             },
             listeners: {
                 'geo-response': '_handleLoc',
-                'kick': '_handleSatori'
+                'sLibrary': '_handleSatoriLibrary',
+                'sEvents': '_handleSatoriEvents'
             },
             observers: ['_routePageChanged(routeData.page)', 'login(user, userData)'],
             ready() {
@@ -252,17 +277,48 @@
                 });
                 return users;
             },
-            _handleSatori(data) {
+            confirm() {
+
+            },
+            dismiss() {
+
+            },
+            reset() {
+                this.set("go", false);
+                setTimeout(function() {
+                    this.set("go", true);
+                }, this.timeOut);
+            },
+            _handleSatoriLibrary(data) {
                 console.log(data.detail.data);
                 this.set("nearbyUsers", this.nearbyUsers.filter(function( obj ) { return obj.id !== data.detail.data.id; }));
                 this.push("nearbyUsers", data.detail.data);
                 if(this.nearbyUsers.length > 1)
                     this.set("nearbyUsers", this.orderNearbyUsers(this.nearbyUsers));
-                if(this.getDistanceFromLatLonInKm(this.lat, this.lng, this.nearbyUsers[0].lat, this.nearbyUsers[0].lon) < this.maxDistanceKm) {
-                    vibrate(5000);
-                    alertOpen();
+                var indicies = [];
+                if(data.detail.data.favorites > 0 && this.favoriteActivities.length > 0 && this.go && this.getDistanceFromLatLonInKm(this.lat, this.lng, this.nearbyUsers[0].lat, this.nearbyUsers[0].lon) < this.maxDistanceKm) {
+                    console.log("Checking user...");
+                    for(var i = 0; i < this.favoriteActivities.length; i++)
+                        if(data.detail.data.favorites[i] == this.favoriteActivities[i])
+                            indicies.push(i);
+                    var activs = [];
+                    for(var i = 0; i < indicies.length; i++)
+                        activs.push(this.activities[indicies[i]]);
+                    var meeticvs = [];
+                    for(var i = 0; i < activs.length; i++)
+                        if(this.meetupOnlyActivities.contains(activs[i]));
+                            meeticvs.push(activs[i]);
+                    if(meeticvs.length > 0)
+                        this.$.rtmEvent.findEvents(meeticvs);
+                    if(indicies.length > 1) {
+                        vibrate(5000);
+                        this.alertOpen();
+                    }
                 }
                 console.log(this.nearbyUsers);
+            },
+            _handleSatoriEvents(data) {
+
             },
             _handleLoc(data) {
                 log("==========================USER LOCATION MONITORING==========================");
@@ -276,13 +332,14 @@
                 log(this.sector);
                 this.set("querySectors", this.getQuerySectors(this.sector, this.increment));
                 this.set("adjacentSectors", this.getAdjacentSectors(this.sector, this.increment));
-                if (isGood(this.user) && isGood(this.user.uid)) this.$.rtm.publishGen(this.sector, {
+                if (isGood(this.user) && isGood(this.user.uid)) this.$.rtmLib.publishGen(this.sector, {
                     "id": this.user.uid,
                     "name": this.userData.name,
                     "lat": data.detail.latitude,
                     "lon": data.detail.longitude,
                     "time": data.detail.position.timestamp,
-                    "sector": this.sector
+                    "sector": this.sector,
+                    "favorites": this.favoriteActivities
                 });
                 log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             },

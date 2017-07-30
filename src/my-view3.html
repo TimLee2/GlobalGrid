@@ -9,16 +9,34 @@
             }
         </style>
         <div class="card">
-            <div class="circle">3</div>
-            <h1>Activity</h1>
-            <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-            <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe
-                pertinax ei, ad pri animal labores suscipiantur.</p>
+            <h1 style="text-align: center;">Interesting Activities</h1>
+            <template is="dom-repeat" items="{{favlists}}" as="{{item}}" index-as="index">
+                <paper-item role="menuitemcheckbox">
+                    <paper-item-body>
+                        [[getName(index)]]
+                    </paper-item-body>
+                    <paper-checkbox checked="{{item}}">Interested?</paper-checkbox>
+                </paper-item>
+            </template>
+            <br>
+            <paper-button raised style="float: right;" on-tap="redirect"><iron-icon icon="my-icons:check"></iron-icon>SUBMIT</paper-button>
+            <div style="clear: both;"></div>
         </div>
     </template>
     <script>
         Polymer({
             is: 'my-view3',
+            properties: {
+                favlists: {
+                    notify: true,
+                }
+            },
+            getName(i) {
+                return this.list[i];
+            },
+            redirect() {
+                window.location.replace("view1");
+            }
         });
     </script>
 </dom-module>

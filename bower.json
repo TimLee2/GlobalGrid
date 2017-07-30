@@ -20,7 +20,9 @@
     "paper-input": "PolymerElements/paper-input#^2.0.1",
     "polymerfire": "firebase/polymerfire#^2.1.0",
     "iron-list": "PolymerElements/iron-list#^2.0.8",
-    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1"
+    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1",
+    "paper-item": "PolymerElements/paper-item#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
