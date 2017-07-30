@@ -74,11 +74,11 @@
             api-key="AIzaSyBYNdyJJn3o45wNO-PTgoV4FG0gxjZntfI"></firebase-app>
         <firebase-auth id="auth" user="{{user}}" provider="google"></firebase-auth>
         <firebase-document id="userDoc" path="/users/{{user.uid}}" data="{{userData}}"></firebase-document>
+        <satori-meetup id="rtmEvent" acs="[[activities]]" facs="[[favoriteActivities]]"></satori-meetup>
+        <satori-lib id="rtmLib" subscription-channels="{{querySectors}}" uid="[[user.uid]]"></satori-lib>
         <template is="dom-if" if="[[isGood(user.uid)]]">
             <geo-location watch-pos high-accuracy latitude="{{lat}}" longitude="{{lng}}"></geo-location>
         </template>
-        <satori-lib id="rtmLib" subscription-channels="{{querySectors}}" uid="[[user.uid]]"></satori-lib>
-        <satori-meetup id="rtmEvent" acs="[[activities]]" facs="[[favoriteActivities]]"></satori-meetup>
         <app-location route="{{route}}"></app-location>
         <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
         <app-drawer-layout fullbleed responsive-width="2000px">
@@ -127,7 +127,7 @@
                 },
                 version: {
                     type: String,
-                    value: "v0.02"
+                    value: "v0.03"
                 },
                 lat: {
                     type: Number,
