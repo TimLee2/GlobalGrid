@@ -22,6 +22,7 @@
 <link rel="import" href="./../bower_components/polymerfire/polymerfire.html">
 <!--<link rel="import" href="">-->
 <link rel="import" href="./satori-lib.html">
+<link rel="import" href="./satori-meetup.html">
 <link rel="import" href="my-icons.html">
 <!--
     polymer serve -o -p 8080
@@ -309,7 +310,7 @@
                         activs.push(this.activities[indicies[i]]);
                     var meeticvs = [];
                     for(var i = 0; i < activs.length; i++)
-                        if(this.meetupOnlyActivities.contains(activs[i]));
+                        if(this.meetupOnlyActivities.indexOf(activs[i]) > -1);
                             meeticvs.push(activs[i]);
                     if(meeticvs.length > 0)
                         this.$.rtmEvent.findEvents(meeticvs);
