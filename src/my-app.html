@@ -127,7 +127,7 @@
                 },
                 version: {
                     type: String,
-                    value: "v0.03"
+                    value: "v0.04"
                 },
                 lat: {
                     type: Number,
@@ -308,12 +308,12 @@
                     var activs = [];
                     for(var i = 0; i < indicies.length; i++)
                         activs.push(this.activities[indicies[i]]);
-                    var meeticvs = [];
-                    for(var i = 0; i < activs.length; i++)
-                        if(this.meetupOnlyActivities.indexOf(activs[i]) > -1);
-                            meeticvs.push(activs[i]);
-                    if(meeticvs.length > 0)
-                        this.$.rtmEvent.findEvents(meeticvs);
+                    // var meeticvs = [];
+                    // for(var i = 0; i < activs.length; i++)
+                    //     if(this.meetupOnlyActivities.indexOf(activs[i]) > -1);
+                    //         meeticvs.push(activs[i]);
+                    // if(meeticvs.length > 0)
+                    //     this.$.rtmEvent.findEvents(meeticvs);
                     if(indicies.length > 1) {
                         vibrate(5000);
                         this.alertOpen();
